@@ -99,7 +99,7 @@ class Car(pygame.sprite.Sprite):
             for h in hearts_sprites:
                 h.heart_remove()
 
-    #                                                !!!!!!!!!!!!!!!!!!!!!!!!!!
+    #                                                !!!!!!!!!!!!!!!!!!!!!!!!!
 
     def line_move(self, pressed_key):
         if pressed_key[pygame.K_UP]:
