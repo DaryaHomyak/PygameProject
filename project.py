@@ -1,10 +1,10 @@
 import pygame
-
+import sqlite3
 import os
 import sys
 import random
 
-WIDTH, HEIGHT = DISPLAY_SIZE = (1200, 900)
+WIDTH, HEIGHT = DISPLAY_SIZE = (1280, 968)
 FPS = 60
 pygame.init()
 screen = pygame.display.set_mode(DISPLAY_SIZE)
@@ -29,20 +29,26 @@ def load_image(name, colorkey=None):
     return image
 
 
+def print_text(message, x, y, font_color='black', font_size=30):
+    font_type = pygame.font.Font(None, font_size)
+    text = font_type.render(message, True, font_color)
+    screen.blit(text, (x, y))
+
+
 def start_screen():
     intro_text = ['гонки', 'Играть!', 'Магазин', "Гараж"]
     fon = pygame.transform.scale(load_image('race_fon.jpg', None), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 50)
     text_coord = 50
-    for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('black'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 30
-        intro_rect.top = text_coord
-        intro_rect.x += 30
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
+    string_rendered = font.render(intro_text[0], 1, pygame.Color('black'))
+    intro_rect = string_rendered.get_rect()
+    text_coord = 30
+    intro_rect.top = text_coord
+    intro_rect.x = 30
+    text_coord = intro_rect.height
+    screen.blit(string_rendered, intro_rect)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -79,12 +85,12 @@ class Car(pygame.sprite.Sprite):
     def __init__(self, *groups):
         super().__init__(*groups)
         self.image = Car.image
-        self.image = pygame.transform.scale(self.image, (512, 256))
+        self.image = pygame.transform.scale(self.image, (256, 128))
         self.rect = Car.image.get_rect()
         self.heart = 3
 
         self.rect.x = 0
-        self.rect.y = 0
+        self.rect.y = 200
         #                                                 !!!!!!!!!!!!!!!!
         #
         #                                                вот здесь проблема с пересечением спрайтов
@@ -101,15 +107,17 @@ class Car(pygame.sprite.Sprite):
 
     #                                                !!!!!!!!!!!!!!!!!!!!!!!!!
 
-    def line_move(self, pressed_key):
-        if pressed_key[pygame.K_UP]:
-            self.rect.y -= 300
-        if pressed_key[pygame.K_DOWN]:
-            self.rect.y += 300
-        if pressed_key[pygame.K_RIGHT]:
-            self.rect.x += 300
-        if pressed_key[pygame.K_LEFT]:
-            self.rect.x -= 300
+    def line_move(self, pressed_keys):
+        if pressed_keys[pygame.K_UP]:
+            if self.rect.y > 300:
+                self.rect.y -= 200
+        if pressed_keys[pygame.K_DOWN]:
+            if self.rect.y < 500:
+                self.rect.y += 200
+        if pressed_keys[pygame.K_RIGHT]:
+            self.rect.x += 200
+        if pressed_keys[pygame.K_LEFT]:
+            self.rect.x -= 200
 
     def trrr(self):
         self.rect.move_ip(random.randrange(-1, 2), 0)
@@ -174,6 +182,21 @@ class Arrow(pygame.sprite.Sprite):
             self.rect.x = 700
 
 
+# пауза игры
+def pause():
+    paused = True
+    while paused:
+
+        print_text('Пауза. Нажмите пробел для продолжения.', 50, HEIGHT // 2, 'white', 50)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            elif event.type == pygame.KEYDOWN:
+                if pygame.key.get_pressed()[pygame.K_PAUSE]:
+                    paused = False
+                    return
+
+
 # создание объектов
 hearts_sprites = pygame.sprite.Group()
 for i in range(1000, 1180, 60):
@@ -190,8 +213,11 @@ Arrow(arrow_sprites)
 
 car_sprites = pygame.sprite.Group()
 Car(car_sprites)
+
+
 # запуск
 start_screen()
+x1, x2 = 0, WIDTH
 running = True
 while running:
     for event in pygame.event.get():
@@ -200,15 +226,27 @@ while running:
         elif event.type == pygame.KEYDOWN:
             for car in car_sprites:
                 car.line_move(pygame.key.get_pressed())
+            if pygame.key.get_pressed()[pygame.K_SPACE]:
+                pause()
+                print('pause')
     screen.fill('black')
-    for i in range(1, 3):
-        pygame.draw.line(screen, 'white', (0, i * 300), (1200, i * 300), 10)
+
+    screen.fill((58, 56, 53))
+
+    fon = pygame.transform.scale(load_image('road.png', None), (WIDTH, 640))
+    x1 = x1 - 10 if x1 > -WIDTH else WIDTH - 10
+    x2 = x2 - 10 if x2 > -WIDTH else WIDTH - 10
+    screen.blit(fon, (x1, 140))
+    screen.blit(fon, (x2, 140))
+
+
     for car in car_sprites:
         car.trrr()
     for z in zombie_sprites:
         z.walk()
     for a in arrow_sprites:
         a.shot()
+
     clock.tick(FPS)
 
     car_sprites.draw(screen)
