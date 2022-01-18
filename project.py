@@ -29,36 +29,40 @@ def load_image(name, colorkey=None):
     return image
 
 
-def print_text(message, x, y, font_color='black', font_size=30):
+def print_text(message="", x=0, y=0, font_color='black', font_size=30, frame_color=None, frame_indent=0, frame_width=1):
     font_type = pygame.font.Font(None, font_size)
     text = font_type.render(message, True, font_color)
     screen.blit(text, (x, y))
+    if frame_color != None:
+        pygame.draw.rect(screen, frame_color, (
+            x - frame_indent, y - frame_indent, text.get_rect()[2] + frame_indent * 2,
+            text.get_rect()[3] + frame_indent * 2), frame_width)
 
 
-def start_screen():
-    intro_text = ['гонки', 'Играть!', 'Магазин', "Гараж"]
-    fon = pygame.transform.scale(load_image('race_fon.jpg', None), (WIDTH, HEIGHT))
-    screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 50)
-    text_coord = 50
-    string_rendered = font.render(intro_text[0], 1, pygame.Color('black'))
-    intro_rect = string_rendered.get_rect()
-    text_coord = 30
-    intro_rect.top = text_coord
-    intro_rect.x = 30
-    text_coord = intro_rect.height
-    screen.blit(string_rendered, intro_rect)
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                return
-
-        pygame.display.flip()
-        clock.tick(FPS)
+# def start_screen():
+#     intro_text = ['гонки', 'Играть!', 'Магазин', "Гараж"]
+#     fon = pygame.transform.scale(load_image('race_fon.jpg', None), (WIDTH, HEIGHT))
+#     screen.blit(fon, (0, 0))
+#     font = pygame.font.Font(None, 50)
+#     text_coord = 50
+#     string_rendered = font.render(intro_text[0], 1, pygame.Color('black'))
+#     intro_rect = string_rendered.get_rect()
+#     text_coord = 30
+#     intro_rect.top = text_coord
+#     intro_rect.x = 30
+#     text_coord = intro_rect.height
+#     screen.blit(string_rendered, intro_rect)
+#
+#     while True:
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 pygame.quit()
+#                 sys.exit()
+#             elif event.type == pygame.MOUSEBUTTONDOWN:
+#                 return
+#
+#         pygame.display.flip()
+#         clock.tick(FPS)
 
 
 class Hearts(pygame.sprite.Sprite):
@@ -80,17 +84,20 @@ class Hearts(pygame.sprite.Sprite):
 
 
 class Car(pygame.sprite.Sprite):
-    image = load_image('car.png')
+    con = sqlite3.connect("Race project")
+    cur = con.cursor()
+    image = load_image(cur.execute("""SELECT link FROM car_icons WHERE status == 'choosed' """).fetchone()[0] + '.png')
+    image = pygame.transform.rotate(image, 90)
 
     def __init__(self, *groups):
         super().__init__(*groups)
         self.image = Car.image
-        self.image = pygame.transform.scale(self.image, (256, 128))
+        self.image = pygame.transform.scale(self.image, (256, 256))
         self.rect = Car.image.get_rect()
         self.heart = 3
 
         self.rect.x = 0
-        self.rect.y = 200
+        self.rect.y = 140
         #                                                 !!!!!!!!!!!!!!!!
         #
         #                                                вот здесь проблема с пересечением спрайтов
@@ -114,10 +121,7 @@ class Car(pygame.sprite.Sprite):
         if pressed_keys[pygame.K_DOWN]:
             if self.rect.y < 500:
                 self.rect.y += 200
-        if pressed_keys[pygame.K_RIGHT]:
-            self.rect.x += 200
-        if pressed_keys[pygame.K_LEFT]:
-            self.rect.x -= 200
+
 
     def trrr(self):
         self.rect.move_ip(random.randrange(-1, 2), 0)
@@ -216,7 +220,7 @@ Car(car_sprites)
 
 
 # запуск
-start_screen()
+# start_screen()
 x1, x2 = 0, WIDTH
 running = True
 while running:
