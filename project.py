@@ -8,6 +8,7 @@ WIDTH, HEIGHT = DISPLAY_SIZE = (1280, 968)
 FPS = 60
 pygame.init()
 screen = pygame.display.set_mode(DISPLAY_SIZE)
+#screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
 pygame.display.set_caption("Race Game")
 clock = pygame.time.Clock()
 
@@ -73,13 +74,13 @@ class Hearts(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.image = Hearts.image
         self.image = pygame.transform.scale(self.image, (60, 60))
-        self.rect = Hearts.image.get_rect()
+        self.rect = self.image.get_rect()
 
         self.rect.x = place
         self.rect.y = 10
 
     def heart_remove(self):
-        self.image = Hearts.image2
+        self.image = self.image2
         self.image = pygame.transform.scale(self.image, (60, 60))
 
 
@@ -93,26 +94,13 @@ class Car(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.image = Car.image
         self.image = pygame.transform.scale(self.image, (256, 256))
-        self.rect = Car.image.get_rect()
+        self.rect = self.image.get_rect()
         self.heart = 3
 
         self.rect.x = 0
-        self.rect.y = 140
-        #                                                 !!!!!!!!!!!!!!!!
-        #
-        #                                                вот здесь проблема с пересечением спрайтов
-        #
-        #   по идее, сердечки должны меняться только при пересечении машинки со стрелой, но при запуске они изменены в самом начале...
+        self.rect.y = 130
 
-        if pygame.sprite.spritecollideany(self, arrow_sprites):
-            for h in hearts_sprites:
-                h.heart_remove()
 
-        if pygame.sprite.spritecollideany(self, zombie_sprites):
-            for h in hearts_sprites:
-                h.heart_remove()
-
-    #                                                !!!!!!!!!!!!!!!!!!!!!!!!!
 
     def line_move(self, pressed_keys):
         if pressed_keys[pygame.K_UP]:
@@ -125,6 +113,14 @@ class Car(pygame.sprite.Sprite):
 
     def trrr(self):
         self.rect.move_ip(random.randrange(-1, 2), 0)
+        if pygame.sprite.spritecollideany(self, arrow_sprites):
+            for h in hearts_sprites:
+                h.heart_remove()
+
+        if pygame.sprite.spritecollideany(self, zombie_sprites):
+            for h in hearts_sprites:
+                h.heart_remove()
+
 
 
 # монстры
@@ -135,7 +131,7 @@ class Skelet(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.image = Skelet.image
         self.image = pygame.transform.scale(self.image, (220, 200))
-        self.rect = Skelet.image.get_rect()
+        self.rect = self.image.get_rect()
 
         self.rect.x = 800
         self.rect.y = 350
@@ -151,7 +147,7 @@ class Zombie(pygame.sprite.Sprite):
         super().__init__(*groups)
         self.image = Zombie.image
         self.image = pygame.transform.scale(self.image, (200, 200))
-        self.rect = Zombie.image.get_rect()
+        self.rect = self.image.get_rect()
 
         self._step = 1
 
@@ -174,7 +170,7 @@ class Arrow(pygame.sprite.Sprite):
         self.image = Arrow.image
         self.image = pygame.transform.flip(self.image, True, False)
         self.image = pygame.transform.scale(self.image, (150, 50))
-        self.rect = Arrow.image.get_rect()
+        self.rect = self.image.get_rect()
 
         self.rect.x = 700
         self.rect.y = 415
