@@ -11,10 +11,9 @@ screen = pygame.display.set_mode(DISPLAY_SIZE)
 pygame.display.set_caption("Race Game")
 clock = pygame.time.Clock()
 
-# конект с бд для получения машинок
+# конект с бд
 con = sqlite3.connect("Race project")
 cur = con.cursor()
-all_cars_info = cur.execute("""SELECT * FROM car_icons ORDER BY price""").fetchall()
 
 
 def load_image(name, colorkey=None):
@@ -35,7 +34,6 @@ def load_image(name, colorkey=None):
 
 
 def cars_draw(last_choice=0):
-    global all_cars_info
     # отрисовка машинок, цен, статусов
     x, y = 750, 0
     cars_bords = list()
@@ -79,7 +77,7 @@ def coins_draw():
 
 
 def screen_reset(last_choice):
-    screen.blit(pygame.transform.scale(load_image('cute.jpg'), (WIDTH, HEIGHT)), (0, 0))
+    screen.blit(pygame.transform.scale(load_image('shop_fon3.jpg'), (WIDTH, HEIGHT)), (0, 0))
     cars_draw(last_choice)
     coins_draw()
     # кнопка выхода в главное меню
