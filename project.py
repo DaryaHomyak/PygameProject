@@ -13,7 +13,6 @@ screen = pygame.display.set_mode(DISPLAY_SIZE)
 pygame.display.set_caption("Race Game")
 clock = pygame.time.Clock()
 coll_sound = pygame.mixer.Sound('data\sound_collide.wav')
-line_sound = pygame.mixer.Sound('data\sound_line_move.aiff')
 
 speed = 10
 paused = False
@@ -423,7 +422,7 @@ def game_screen():
     x1_road, x2_road = 0, WIDTH
     x1_snow, y1_snow, x2_snow, y2_snow, x3_snow, y3_snow, x4_snow, y4_snow, = 0, 0, -WIDTH, -HEIGHT, 0, -HEIGHT, WIDTH, 0
     time_count = 0
-    metres = 1000
+    metres = 1900
     speed = 10
 
     TRUCK_SPAWN = pygame.USEREVENT + 1
