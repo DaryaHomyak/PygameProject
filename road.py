@@ -8,7 +8,7 @@ pygame.init()
 screen = pygame.display.set_mode(DISPLAY_SIZE)
 pygame.display.set_caption("Race Game")
 clock = pygame.time.Clock()
-speed = 10
+speed = 100
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     # если файл не существует, то выходим
@@ -37,9 +37,9 @@ while running:
     screen.fill('black')
     screen.fill((58, 56, 53))
 
-    fon = pygame.transform.scale(load_image('road2.png', None), (HEIGHT, HEIGHT))
-    x1 = x1 - speed if x1 > -HEIGHT else HEIGHT - speed
-    x2 = x2 - speed if x2 > -HEIGHT else HEIGHT - speed
+    fon = pygame.transform.scale(load_image('road.png', None), (HEIGHT, HEIGHT))
+    x1 = x1 - speed if x1 > -HEIGHT + speed else HEIGHT - speed
+    x2 = x2 - speed if x2 > -HEIGHT + speed else HEIGHT - speed
     screen.blit(fon, (x1, 0))
     screen.blit(fon, (x2, 0))
 
